@@ -251,4 +251,3 @@ for i in [1,2,3,4,5,6,7,8,11,13,14]:
             file.write(f"{guard[0]} {guard[1]}\n")
 
     print(f"Solution pour l'instance {instance_path} enregistrée dans {solution_path}.")
-
