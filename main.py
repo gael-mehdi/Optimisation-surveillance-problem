@@ -1,6 +1,5 @@
 def load_grid(file_path):
     grid = []
-    targets = []
     with open(file_path, 'r') as file:
         for line in file:
             line = line.strip()
@@ -14,43 +13,28 @@ def load_grid(file_path):
                         row.extend([False] * (columns - len(row)))
             elif line.startswith('CIBLE'):
                 _, x, y = line.split()
-                targets.append((int(x), int(y)))
-                grid[int(x)][int(y)] = True
+                grid[int(x)][int(y)] = 'CIBLE'
             elif line.startswith('OBSTACLE'):
                 _, x, y = line.split()
-                grid[int(x)][int(y)] = False
-    return grid, targets
+                grid[int(x)][int(y)] = 'OBSTACLE'
+    return grid
 
-def place_guards(grid, targets):
+def place_guards(grid):
     guards = []
     rows = len(grid)
     columns = len(grid[0])
-    targets = sorted(targets, key=lambda target: (target[0], target[1]))  # Trie les cibles par coordonnées
-    for target in targets:
-        x, y = target
-        if grid[x][y]:
-            # Vérifie si la cible est déjà couverte par un gardien voisin
-            is_covered = False
-            for dx in [-1, 0, 1]:
-                for dy in [-1, 0, 1]:
-                    nx, ny = x + dx, y + dy
-                    if 0 <= nx < rows and 0 <= ny < columns:
-                        if grid[nx][ny] and (nx, ny) in guards:
-                            is_covered = True
-                            break
-                if is_covered:
-                    break
-            if not is_covered:
-                # Ajoute un nouveau gardien pour couvrir la cible
-                guards.append((x, y))
+    for x in range(rows):
+        for y in range(columns):
+            if grid[x][y] == 'CIBLE':
                 for i in range(y, columns):
                     if grid[x][i] == 'OBSTACLE':
                         break
-                    grid[x][i] = False
+                    grid[x][i] = True
                 for i in range(y, -1, -1):
                     if grid[x][i] == 'OBSTACLE':
                         break
-                    grid[x][i] = False
+                    grid[x][i] = True
+                guards.append((x, y))
     return guards
 
 """
@@ -76,10 +60,10 @@ for i in range(1, 17):
     solution_path = f'res{i}.txt'
 
     # Chargement de la grille
-    grid, targets = load_grid(instance_path)
+    grid = load_grid(instance_path)
 
     # Placement des gardiens
-    guards = place_guards(grid, targets)
+    guards = place_guards(grid)
 
     # Enregistrement des positions des gardiens dans le fichier de solution
     with open(solution_path, 'w') as file:
