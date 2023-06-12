@@ -60,48 +60,44 @@ def place_guards(grid):
     guards = []
     rows = len(grid)
     columns = len(grid[0])
+    targets = []
 
-    while True:
-        best_guard = None
-        max_visible_targets = 0
+    # Calcul de la visibilité de chaque cible depuis chaque position de gardien possible
+    for x in range(rows):
+        for y in range(columns):
+            if grid[x][y] == 'CIBLE':
+                visibility = count_visible_targets(grid, x, y)
+                targets.append((x, y, visibility))
 
-        # Parcourir toutes les positions de gardien possibles
-        for x in range(rows):
-            for y in range(columns):
-                if grid[x][y] == 'CIBLE':
-                    visible_targets = count_visible_targets(grid, x, y)
-                    if visible_targets > max_visible_targets:
-                        max_visible_targets = visible_targets
-                        best_guard = (x, y)
+    # Tri des positions de gardien en fonction de leur visibilité décroissante
+    targets.sort(key=lambda t: t[2], reverse=True)
 
-        # S'il n'y a plus de cibles visibles, sortir de la boucle
-        if best_guard is None:
-            break
-
-        # Supprimer les cibles visibles par le meilleur gardien
-        x, y = best_guard
-        for i in range(y, columns):
-            if grid[x][i] == 'CIBLE':
-                grid[x][i] = False
-            if grid[x][i] == 'OBSTACLE':
-                break
-        for i in range(y, -1, -1):
-            if grid[x][i] == 'CIBLE':
-                grid[x][i] = False
-            if grid[x][i] == 'OBSTACLE':
-                break
-        for i in range(x, rows):
-            if grid[i][y] == 'CIBLE':
-                grid[i][y] = False
-            if grid[i][y] == 'OBSTACLE':
-                break
-        for i in range(x, -1, -1):
-            if grid[i][y] == 'CIBLE':
-                grid[i][y] = False
-            if grid[i][y] == 'OBSTACLE':
-                break
-
-        guards.append(best_guard)
+    # Sélection des gardiens en fonction de leur visibilité
+    for target in targets:
+        x, y, _ = target
+        if not any(guard[0] == x or guard[1] == y for guard in guards):
+            guards.append((x, y))
+            # Marquage des cibles visibles depuis cette position comme couvertes
+            for i in range(y, columns):
+                if grid[x][i] == 'CIBLE':
+                    grid[x][i] = False
+                if grid[x][i] == 'OBSTACLE':
+                    break
+            for i in range(y, -1, -1):
+                if grid[x][i] == 'CIBLE':
+                    grid[x][i] = False
+                if grid[x][i] == 'OBSTACLE':
+                    break
+            for i in range(x, rows):
+                if grid[i][y] == 'CIBLE':
+                    grid[i][y] = False
+                if grid[i][y] == 'OBSTACLE':
+                    break
+            for i in range(x, -1, -1):
+                if grid[i][y] == 'CIBLE':
+                    grid[i][y] = False
+                if grid[i][y] == 'OBSTACLE':
+                    break
 
     return guards
 

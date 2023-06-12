@@ -21,30 +21,88 @@ def load_grid(file_path):
                 grid[int(x)][int(y)] = 'OBSTACLE'
     return grid
 
+def count_visible_targets(grid, x, y):
+    rows = len(grid)
+    columns = len(grid[0])
+    count = 0
+
+    # Vérifier les cibles visibles vers la droite
+    for i in range(y, columns):
+        if grid[x][i] == 'CIBLE':
+            count += 1
+        if grid[x][i] == 'OBSTACLE':
+            break
+
+    # Vérifier les cibles visibles vers la gauche
+    for i in range(y, -1, -1):
+        if grid[x][i] == 'CIBLE':
+            count += 1
+        if grid[x][i] == 'OBSTACLE':
+            break
+
+    # Vérifier les cibles visibles vers le bas
+    for i in range(x, rows):
+        if grid[i][y] == 'CIBLE':
+            count += 1
+        if grid[i][y] == 'OBSTACLE':
+            break
+
+    # Vérifier les cibles visibles vers le haut
+    for i in range(x, -1, -1):
+        if grid[i][y] == 'CIBLE':
+            count += 1
+        if grid[i][y] == 'OBSTACLE':
+            break
+
+    return count
+
 def place_guards(grid):
     guards = []
     rows = len(grid)
     columns = len(grid[0])
-    for x in range(rows):
-        for y in range(columns):
-            if grid[x][y] == 'CIBLE':
-                for i in range(y, columns):
-                    if grid[x][i] == 'OBSTACLE':
-                        break
-                    grid[x][i] = True
-                for i in range(y, -1, -1):
-                    if grid[x][i] == 'OBSTACLE':
-                        break
-                    grid[x][i] = True
-                for i in range(x, rows):
-                    if grid[i][y] == 'OBSTACLE':
-                        break
-                    grid[i][y] = True
-                for i in range(x, -1, -1):
-                    if grid[i][y] == 'OBSTACLE':
-                        break
-                    grid[i][y] = True
-                guards.append((x, y))
+
+    while True:
+        best_guard = None
+        max_visible_targets = 0
+
+        # Parcourir toutes les positions de gardien possibles
+        for x in range(rows):
+            for y in range(columns):
+                if grid[x][y] == 'CIBLE':
+                    visible_targets = count_visible_targets(grid, x, y)
+                    if visible_targets > max_visible_targets:
+                        max_visible_targets = visible_targets
+                        best_guard = (x, y)
+
+        # S'il n'y a plus de cibles visibles, sortir de la boucle
+        if best_guard is None:
+            break
+
+        # Supprimer les cibles visibles par le meilleur gardien
+        x, y = best_guard
+        for i in range(y, columns):
+            if grid[x][i] == 'CIBLE':
+                grid[x][i] = False
+            if grid[x][i] == 'OBSTACLE':
+                break
+        for i in range(y, -1, -1):
+            if grid[x][i] == 'CIBLE':
+                grid[x][i] = False
+            if grid[x][i] == 'OBSTACLE':
+                break
+        for i in range(x, rows):
+            if grid[i][y] == 'CIBLE':
+                grid[i][y] = False
+            if grid[i][y] == 'OBSTACLE':
+                break
+        for i in range(x, -1, -1):
+            if grid[i][y] == 'CIBLE':
+                grid[i][y] = False
+            if grid[i][y] == 'OBSTACLE':
+                break
+
+        guards.append(best_guard)
+
     return guards
 
 # Boucle pour traiter toutes les instances
