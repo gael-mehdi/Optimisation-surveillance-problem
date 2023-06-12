@@ -36,6 +36,14 @@ def place_guards(grid):
                     if grid[x][i] == 'OBSTACLE':
                         break
                     grid[x][i] = True
+                for i in range(x, rows):
+                    if grid[i][y] == 'OBSTACLE':
+                        break
+                    grid[i][y] = True
+                for i in range(x, -1, -1):
+                    if grid[i][y] == 'OBSTACLE':
+                        break
+                    grid[i][y] = True
                 guards.append((x, y))
     return guards
 
