@@ -74,36 +74,161 @@ def place_guardsARM(grid):
         if max_position is None:
             break
 
-        # Ajout du surveillant à la position choisie
-        guards.append(max_position)
-
-        # Marquage des cibles comme surveillées
+        # Si la position choisie est une cible sur un bord avec 3 obstacles autour,
+        # on place un gardien sur la cible et on marque les obstacles comme surveillés
         x, y = max_position
-        i = y - 1
-        while i >= 0 and grid[x][i] != 'OBSTACLE':
-            if grid[x][i] == 'CIBLE':
-                grid[x][i] = 'SURVEILLED'
-            i -= 1
+        if is_target_on_edge_with_3_obstacles(grid, x, y):
+            grid[x][y] = 'GARDIEN'
+            guards.append(max_position)
+            mark_obstacles_as_surveilled(grid, x, y)
+        else:
+            # Ajout du surveillant à la position choisie
+            guards.append(max_position)
 
-        i = y + 1
-        while i < columns and grid[x][i] != 'OBSTACLE':
-            if grid[x][i] == 'CIBLE':
-                grid[x][i] = 'SURVEILLED'
-            i += 1
-
-        i = x - 1
-        while i >= 0 and grid[i][y] != 'OBSTACLE':
-            if grid[i][y] == 'CIBLE':
-                grid[i][y] = 'SURVEILLED'
-            i -= 1
-
-        i = x + 1
-        while i < rows and grid[i][y] != 'OBSTACLE':
-            if grid[i][y] == 'CIBLE':
-                grid[i][y] = 'SURVEILLED'
-            i += 1
+            # Marquage des cibles comme surveillées
+            mark_targets_as_surveilled(grid, x, y)
 
     return guards
+
+def is_target_on_edge_with_3_obstacles(grid, x, y):
+    rows = len(grid)
+    columns = len(grid[0])
+
+    if x == 0:
+        if y == 0:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x + 1][y + 1] == 'OBSTACLE'
+            )
+        elif y == columns - 1:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x + 1][y - 1] == 'OBSTACLE'
+            )
+        else:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x + 1][y - 1] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x + 1][y + 1] == 'OBSTACLE'
+            )
+    elif x == rows - 1:
+        if y == 0:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x - 1][y + 1] == 'OBSTACLE'
+            )
+        elif y == columns - 1:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x - 1][y - 1] == 'OBSTACLE'
+            )
+        else:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x - 1][y - 1] == 'OBSTACLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x - 1][y + 1] == 'OBSTACLE'
+            )
+    else:
+        if y == 0:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x - 1][y + 1] == 'OBSTACLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x + 1][y + 1] == 'OBSTACLE'
+            )
+        elif y == columns - 1:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x - 1][y - 1] == 'OBSTACLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x + 1][y - 1] == 'OBSTACLE'
+            )
+        else:
+            return (
+                grid[x][y] == 'CIBLE' and
+                grid[x][y - 1] == 'OBSTACLE' and
+                grid[x][y + 1] == 'OBSTACLE' and
+                grid[x - 1][y - 1] == 'OBSTACLE' and
+                grid[x - 1][y] == 'OBSTACLE' and
+                grid[x - 1][y + 1] == 'OBSTACLE' and
+                grid[x + 1][y - 1] == 'OBSTACLE' and
+                grid[x + 1][y] == 'OBSTACLE' and
+                grid[x + 1][y + 1] == 'OBSTACLE'
+            )
+
+def mark_targets_as_surveilled(grid, x, y):
+    rows = len(grid)
+    columns = len(grid[0])
+
+    i = y - 1
+    while i >= 0 and grid[x][i] != 'OBSTACLE':
+        if grid[x][i] == 'CIBLE':
+            grid[x][i] = 'SURVEILLED'
+        i -= 1
+
+    i = y + 1
+    while i < columns and grid[x][i] != 'OBSTACLE':
+        if grid[x][i] == 'CIBLE':
+            grid[x][i] = 'SURVEILLED'
+        i += 1
+
+    i = x - 1
+    while i >= 0 and grid[i][y] != 'OBSTACLE':
+        if grid[i][y] == 'CIBLE':
+            grid[i][y] = 'SURVEILLED'
+        i -= 1
+
+    i = x + 1
+    while i < rows and grid[i][y] != 'OBSTACLE':
+        if grid[i][y] == 'CIBLE':
+            grid[i][y] = 'SURVEILLED'
+        i += 1
+
+def mark_obstacles_as_surveilled(grid, x, y):
+    rows = len(grid)
+    columns = len(grid[0])
+
+    i = y - 1
+    while i >= 0 and grid[x][i] != 'OBSTACLE':
+        if grid[x][i] == 'OBSTACLE':
+            grid[x][i] = 'SURVEILLED'
+        i -= 1
+
+    i = y + 1
+    while i < columns and grid[x][i] != 'OBSTACLE':
+        if grid[x][i] == 'OBSTACLE':
+            grid[x][i] = 'SURVEILLED'
+        i += 1
+
+    i = x - 1
+    while i >= 0 and grid[i][y] != 'OBSTACLE':
+        if grid[i][y] == 'OBSTACLE':
+            grid[i][y] = 'SURVEILLED'
+        i -= 1
+
+    i = x + 1
+    while i < rows and grid[i][y] != 'OBSTACLE':
+        if grid[i][y] == 'OBSTACLE':
+            grid[i][y] = 'SURVEILLED'
+        i += 1
 
 # Boucle pour traiter toutes les instances
 for i in range(1,17):
