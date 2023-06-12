@@ -57,7 +57,7 @@ print("Positions des gardiens enregistrées dans sol1.txt.")
 # Boucle pour traiter toutes les instances
 for i in range(1, 17):
     instance_path = f'Instances-20230612/gr{i}.txt'
-    solution_path = f'sol{i}.txt'
+    solution_path = f'res{i}.txt'
 
     # Chargement de la grille
     grid = load_grid(instance_path)
