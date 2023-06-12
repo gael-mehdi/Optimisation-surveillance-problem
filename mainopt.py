@@ -26,15 +26,24 @@ def place_guards(grid):
     for x in range(rows):
         for y in range(columns):
             if grid[x][y] == 'CIBLE':
-                for i in range(y, columns):
-                    if grid[x][i] == 'OBSTACLE':
+                # Check if the target is already covered by a guard
+                is_covered = False
+                for guard in guards:
+                    if guard[0] == x or guard[1] == y:
+                        is_covered = True
                         break
-                    grid[x][i] = True
-                for i in range(y, -1, -1):
-                    if grid[x][i] == 'OBSTACLE':
-                        break
-                    grid[x][i] = True
-                guards.append((x, y))
+
+                if not is_covered:
+                    # Place a guard at the target
+                    guards.append((x, y))
+                    for i in range(y+1, columns):
+                        if grid[x][i] == 'OBSTACLE':
+                            break
+                        grid[x][i] = True
+                    for i in range(y-1, -1, -1):
+                        if grid[x][i] == 'OBSTACLE':
+                            break
+                        grid[x][i] = True
     return guards
 
 # Boucle pour traiter toutes les instances
