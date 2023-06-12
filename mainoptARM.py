@@ -112,7 +112,6 @@ for i in range(1,16):
 
     # Chargement de la grille
     grid = load_gridARM(instance_path)
-    print(grid)
 
     # Placement des gardiens
     guards = place_guardsARM(grid)
