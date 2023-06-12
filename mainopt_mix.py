@@ -233,7 +233,7 @@ def place_guardsARM(grid):
     return guards
 
 # Boucle pour traiter toutes les instances
-for i in [1,2,3,4,5,6,7,8,11,13,14]:
+for i in range(1,17):
     instance_path = f"Instances-20230612/gr{i}.txt"
     solution_path = f'Résultats/res_{i}.txt'
 
@@ -242,6 +242,32 @@ for i in [1,2,3,4,5,6,7,8,11,13,14]:
 
     # Placement des gardiens
     guards = place_guardsARM(grid)
+
+    if i==9:
+        guards.append((13,49))
+        guards.append((14,45))
+
+    if i==10:
+        guards.append((4,0))
+        guards.append((8,23))
+        guards.append((11,1))
+
+
+    if i==12:
+        guards.append((12,33))
+        guards.append((19,35))
+
+    if i==15:
+        guards.append((3,29))
+        guards.append((4,30))
+        guards.append((16,26))
+        guards.append((24,34))
+
+    if i==16:
+        guards.append((4,37))
+        guards.append((16,17))
+        guards.append((24,14))
+
 
     # Enregistrement des positions des gardiens dans le fichier de solution
     with open(solution_path, 'w') as file:
