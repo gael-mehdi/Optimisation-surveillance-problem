@@ -106,7 +106,7 @@ def place_guards(grid):
     return guards
 
 # Boucle pour traiter toutes les instances
-for i in [9,10,12,15]:
+for i in [9,10,12,15,16]:
     instance_path = f'Instances-20230612/gr{i}.txt'
     solution_path = f'Résultats/res_{i}.txt'
 
@@ -233,7 +233,7 @@ def place_guardsARM(grid):
     return guards
 
 # Boucle pour traiter toutes les instances
-for i in [1,2,3,4,5,6,7,8,11,13,14,16]:
+for i in [1,2,3,4,5,6,7,8,11,13,14]:
     instance_path = f"Instances-20230612/gr{i}.txt"
     solution_path = f'Résultats/res_{i}.txt'
 
