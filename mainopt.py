@@ -5,12 +5,12 @@ def load_grid(file_path):
             line = line.strip()
             if line.startswith('LIGNES'):
                 rows = int(line.split()[1])
-                grid = [[False] * rows for _ in range(rows)]
+                grid = [['.'] * rows for _ in range(rows)]
             elif line.startswith('COLONNES'):
                 columns = int(line.split()[1])
                 if len(grid) != 0:
                     for row in grid:
-                        row.extend([False] * (columns - len(row)))
+                        row.extend(['.'] * (columns - len(row)))
             elif line.startswith('CIBLE'):
                 _, x, y = line.split()
                 grid[int(x)][int(y)] = 'CIBLE'
@@ -36,14 +36,24 @@ def place_guards(grid):
                 if not is_covered:
                     # Place a guard at the target
                     guards.append((x, y))
-                    for i in range(y+1, columns):
+                    # Update the guard's vision on the same row
+                    for i in range(y + 1, columns):
                         if grid[x][i] == 'OBSTACLE':
                             break
-                        grid[x][i] = True
-                    for i in range(y-1, -1, -1):
+                        if grid[x][i] != 'CIBLE':
+                            grid[x][i] = 'COVERED'
+                    for i in range(y - 1, -1, -1):
                         if grid[x][i] == 'OBSTACLE':
                             break
-                        grid[x][i] = True
+                        if grid[x][i] != 'CIBLE':
+                            grid[x][i] = 'COVERED'
+
+    # Check for any remaining uncovered targets
+    for x in range(rows):
+        for y in range(columns):
+            if grid[x][y] == 'CIBLE':
+                guards.append((x, y))
+
     return guards
 
 # Boucle pour traiter toutes les instances
