@@ -1,16 +1,18 @@
 def load_grid(file_path):
     grid = []
     with open(file_path, 'r') as file:
+        rows = None
+        columns = None
         for line in file:
             line = line.strip()
             if line.startswith('LIGNES'):
                 rows = int(line.split()[1])
-                grid = [['.'] * rows for _ in range(rows)]
+                grid = [[False] * rows for _ in range(rows)]
             elif line.startswith('COLONNES'):
                 columns = int(line.split()[1])
                 if len(grid) != 0:
                     for row in grid:
-                        row.extend(['.'] * (columns - len(row)))
+                        row.extend([False] * (columns - len(row)))
             elif line.startswith('CIBLE'):
                 _, x, y = line.split()
                 grid[int(x)][int(y)] = 'CIBLE'
@@ -26,34 +28,23 @@ def place_guards(grid):
     for x in range(rows):
         for y in range(columns):
             if grid[x][y] == 'CIBLE':
-                # Check if the target is already covered by a guard
-                is_covered = False
-                for guard in guards:
-                    if guard[0] == x or guard[1] == y:
-                        is_covered = True
+                for i in range(y, columns):
+                    if grid[x][i] == 'OBSTACLE':
                         break
-
-                if not is_covered:
-                    # Place a guard at the target
-                    guards.append((x, y))
-                    # Update the guard's vision on the same row
-                    for i in range(y + 1, columns):
-                        if grid[x][i] == 'OBSTACLE':
-                            break
-                        if grid[x][i] != 'CIBLE':
-                            grid[x][i] = 'COVERED'
-                    for i in range(y - 1, -1, -1):
-                        if grid[x][i] == 'OBSTACLE':
-                            break
-                        if grid[x][i] != 'CIBLE':
-                            grid[x][i] = 'COVERED'
-
-    # Check for any remaining uncovered targets
-    for x in range(rows):
-        for y in range(columns):
-            if grid[x][y] == 'CIBLE':
+                    grid[x][i] = True
+                for i in range(y, -1, -1):
+                    if grid[x][i] == 'OBSTACLE':
+                        break
+                    grid[x][i] = True
+                for i in range(x, rows):
+                    if grid[i][y] == 'OBSTACLE':
+                        break
+                    grid[i][y] = True
+                for i in range(x, -1, -1):
+                    if grid[i][y] == 'OBSTACLE':
+                        break
+                    grid[i][y] = True
                 guards.append((x, y))
-
     return guards
 
 # Boucle pour traiter toutes les instances
