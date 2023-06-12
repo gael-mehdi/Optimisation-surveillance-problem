@@ -91,6 +91,21 @@ def place_guards(grid, targets):
                 if 0 <= nx < rows and 0 <= ny < columns:
                     if grid[nx][ny] and (nx, ny) not in guards:
                         cost += 1
+        # Vérification de la visibilité de toutes les cibles par les gardiens
+        for x, y in targets:
+            if (x, y) not in guards:
+                visible = False
+                for dx in range(-1, 2):
+                    for dy in range(-1, 2):
+                        nx, ny = x + dx, y + dy
+                        if 0 <= nx < rows and 0 <= ny < columns:
+                            if (nx, ny) in guards:
+                                visible = True
+                                break
+                    if visible:
+                        break
+                if not visible:
+                    cost += 1
         return cost
 
     rows = len(grid)
