@@ -1,0 +1,12 @@
+EQUIPE lionel pepsi
+INSTANCE 3
+9 6
+0 18
+2 7
+0 0
+3 0
+4 13
+4 10
+6 0
+6 16
+8 18

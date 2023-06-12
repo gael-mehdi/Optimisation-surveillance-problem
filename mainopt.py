@@ -1,18 +1,16 @@
 def load_grid(file_path):
     grid = []
     with open(file_path, 'r') as file:
-        rows = None
-        columns = None
         for line in file:
             line = line.strip()
             if line.startswith('LIGNES'):
                 rows = int(line.split()[1])
-                grid = [[False] * rows for _ in range(rows)]
+                grid = [['VIDE'] * rows for _ in range(rows)]  # Utilisation de 'VIDE' au lieu de False
             elif line.startswith('COLONNES'):
                 columns = int(line.split()[1])
                 if len(grid) != 0:
                     for row in grid:
-                        row.extend([False] * (columns - len(row)))
+                        row.extend(['VIDE'] * (columns - len(row)))  # Utilisation de 'VIDE' au lieu de False
             elif line.startswith('CIBLE'):
                 _, x, y = line.split()
                 grid[int(x)][int(y)] = 'CIBLE'
@@ -22,37 +20,35 @@ def load_grid(file_path):
     return grid
 
 def count_visible_targets(grid, x, y):
+    count = 0
     rows = len(grid)
     columns = len(grid[0])
-    count = 0
 
-    # Vérifier les cibles visibles vers la droite
-    for i in range(y, columns):
+    # Recherche horizontale
+    i = y - 1
+    while i >= 0 and grid[x][i] != 'OBSTACLE':
         if grid[x][i] == 'CIBLE':
             count += 1
-        if grid[x][i] == 'OBSTACLE':
-            break
+        i -= 1
 
-    # Vérifier les cibles visibles vers la gauche
-    for i in range(y, -1, -1):
+    i = y + 1
+    while i < columns and grid[x][i] != 'OBSTACLE':
         if grid[x][i] == 'CIBLE':
             count += 1
-        if grid[x][i] == 'OBSTACLE':
-            break
+        i += 1
 
-    # Vérifier les cibles visibles vers le bas
-    for i in range(x, rows):
+    # Recherche verticale
+    i = x - 1
+    while i >= 0 and grid[i][y] != 'OBSTACLE':
         if grid[i][y] == 'CIBLE':
             count += 1
-        if grid[i][y] == 'OBSTACLE':
-            break
+        i -= 1
 
-    # Vérifier les cibles visibles vers le haut
-    for i in range(x, -1, -1):
+    i = x + 1
+    while i < rows and grid[i][y] != 'OBSTACLE':
         if grid[i][y] == 'CIBLE':
             count += 1
-        if grid[i][y] == 'OBSTACLE':
-            break
+        i += 1
 
     return count
 
@@ -60,51 +56,59 @@ def place_guards(grid):
     guards = []
     rows = len(grid)
     columns = len(grid[0])
-    targets = []
 
-    # Calcul de la visibilité de chaque cible depuis chaque position de gardien possible
-    for x in range(rows):
-        for y in range(columns):
-            if grid[x][y] == 'CIBLE':
-                visibility = count_visible_targets(grid, x, y)
-                targets.append((x, y, visibility))
+    while True:
+        max_count = 0
+        max_position = None
 
-    # Tri des positions de gardien en fonction de leur visibilité décroissante
-    targets.sort(key=lambda t: t[2], reverse=True)
+        # Parcours de la grille pour trouver la position avec le maximum de cibles visibles
+        for x in range(rows):
+            for y in range(columns):
+                if grid[x][y] != 'OBSTACLE' and (x, y) not in guards:
+                    count = count_visible_targets(grid, x, y)
+                    if count > max_count:
+                        max_count = count
+                        max_position = (x, y)
 
-    # Sélection des gardiens en fonction de leur visibilité
-    for target in targets:
-        x, y, _ = target
-        if not any(guard[0] == x or guard[1] == y for guard in guards):
-            guards.append((x, y))
-            # Marquage des cibles visibles depuis cette position comme couvertes
-            for i in range(y, columns):
-                if grid[x][i] == 'CIBLE':
-                    grid[x][i] = False
-                if grid[x][i] == 'OBSTACLE':
-                    break
-            for i in range(y, -1, -1):
-                if grid[x][i] == 'CIBLE':
-                    grid[x][i] = False
-                if grid[x][i] == 'OBSTACLE':
-                    break
-            for i in range(x, rows):
-                if grid[i][y] == 'CIBLE':
-                    grid[i][y] = False
-                if grid[i][y] == 'OBSTACLE':
-                    break
-            for i in range(x, -1, -1):
-                if grid[i][y] == 'CIBLE':
-                    grid[i][y] = False
-                if grid[i][y] == 'OBSTACLE':
-                    break
+        # Si aucune position avec des cibles visibles n'est trouvée, on a terminé
+        if max_position is None:
+            break
+
+        # Ajout du surveillant à la position choisie
+        guards.append(max_position)
+
+        # Marquage des cibles comme surveillées
+        x, y = max_position
+        i = y - 1
+        while i >= 0 and grid[x][i] != 'OBSTACLE':
+            if grid[x][i] == 'CIBLE':
+                grid[x][i] = 'SURVEILLED'
+            i -= 1
+
+        i = y + 1
+        while i < columns and grid[x][i] != 'OBSTACLE':
+            if grid[x][i] == 'CIBLE':
+                grid[x][i] = 'SURVEILLED'
+            i += 1
+
+        i = x - 1
+        while i >= 0 and grid[i][y] != 'OBSTACLE':
+            if grid[i][y] == 'CIBLE':
+                grid[i][y] = 'SURVEILLED'
+            i -= 1
+
+        i = x + 1
+        while i < rows and grid[i][y] != 'OBSTACLE':
+            if grid[i][y] == 'CIBLE':
+                grid[i][y] = 'SURVEILLED'
+            i += 1
 
     return guards
 
 # Boucle pour traiter toutes les instances
 for i in range(1, 17):
-    instance_path = f'Instances-20230612/gr{i}.txt'
-    solution_path = f'res_{i}.txt'
+    instance_path = f"Instances-20230612/gr{i}.txt"
+    solution_path = f'Résultats/res_{i}.txt'
 
     # Chargement de la grille
     grid = load_grid(instance_path)
