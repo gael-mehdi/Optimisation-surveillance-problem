@@ -118,6 +118,21 @@ int main() {
     printf("Nombre de gardiens nécessaires : %d\n", numGuardians);
     printf("Nombre de cibles non surveillées : %d\n", numUncoveredTargets);
 
+    // Écriture des positions des gardiens dans le fichier texte
+    FILE *file = fopen("sol1.txt", "w");
+    if (file == NULL) {
+        printf("Erreur lors de l'ouverture du fichier.\n");
+        exit(1);
+    }
+    fprintf(file, "EQUIPE lionel pepsi\n");
+    fprintf(file, "INSTANCE 1\n");
+    for (int i = 0; i < grid.numTargets; i++) {
+        if (grid.targets[i].isCovered) {
+            fprintf(file, "%d %d\n", grid.targets[i].target.x, grid.targets[i].target.y);
+        }
+    }
+    fclose(file);
+
     free(grid.obstacles);
     free(grid.targets);
 
