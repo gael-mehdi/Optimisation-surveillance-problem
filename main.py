@@ -1,6 +1,8 @@
 def load_grid(file_path):
     grid = []
     with open(file_path, 'r') as file:
+        rows = None
+        columns = None
         for line in file:
             line = line.strip()
             if line.startswith('LIGNES'):

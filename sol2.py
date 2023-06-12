@@ -1,19 +1,29 @@
 from collections import defaultdict
 
 # Fonction pour lire les données à partir du fichier
+# Fonction pour lire les données à partir du fichier
+# Fonction pour lire les données à partir du fichier
 def lire_donnees(nom_fichier):
     obstacles = []
     cibles = []
-    
+    lignes = None
+    colonnes = None
+
     with open(nom_fichier, 'r') as f:
         for ligne in f:
             ligne = ligne.strip().split()
-            if ligne[0] == 'OBSTACLE':
-                obstacles.append((int(ligne[1]), int(ligne[2])))
+            if ligne[0] == 'LIGNES':
+                lignes = int(ligne[1])
+            elif ligne[0] == 'COLONNES':
+                colonnes = int(ligne[1])
             elif ligne[0] == 'CIBLE':
                 cibles.append((int(ligne[1]), int(ligne[2])))
+            elif ligne[0] == 'OBSTACLE':
+                obstacles.append((int(ligne[1]), int(ligne[2])))
     
-    return obstacles, cibles
+    return obstacles, cibles, lignes, colonnes
+
+
 
 # Fonction pour trouver les cases vides couvertes par une cible
 def trouver_cases_vides(obstacles, cible):
@@ -80,16 +90,31 @@ def afficher_surveillants(surveillants):
     for i, surveillant in enumerate(surveillants):
         print(f"Surveillant {i+1} : {surveillant}")
 
-# Lecture des données à partir du fichier
-obstacles, cibles = lire_donnees("chemin_vers_le_fichier.txt")
+# Boucle pour traiter toutes les instances
+for i in range(1, 17):
+    instance_path = f'Instances-20230612/gr{i}.txt'
+    solution_path = f'res_{i}.txt'
 
-# Détermination du nombre de lignes et de colonnes à partir des données
-lignes = max(max(obstacles)[0], max(cibles)[0]) + 1
-colonnes = max(max(obstacles)[1], max(cibles)[1]) + 1
+    # Lecture des données à partir du fichier
+    obstacles, cibles, lignes, colonnes = lire_donnees(instance_path)
 
-# Placement des surveillants
-surveillants = placer_surveillants(obstacles, cibles)
 
-# Affichage des positions des surveillants
-afficher_surveillants(surveillants)
+    # Détermination du nombre de lignes et de colonnes à partir des données
+    lignes = max(max(obstacles)[0], max(cibles)[0]) + 1
+    colonnes = max(max(obstacles)[1], max(cibles)[1]) + 1
 
+    # Placement des surveillants
+    surveillants = placer_surveillants(obstacles, cibles)
+
+    # Affichage des positions des surveillants
+    afficher_surveillants(surveillants)
+
+    # Enregistrement des positions des surveillants dans le fichier de solution
+    with open(solution_path, 'w') as file:
+        file.write("EQUIPE lionel pepsi\n")
+        file.write(f"INSTANCE {i}\n")
+        for surveillant in surveillants:
+            for position in surveillant:
+                file.write(f"{position[0]} {position[1]}\n")
+
+    print(f"Solution pour l'instance {instance_path} enregistrée dans {solution_path}.")
